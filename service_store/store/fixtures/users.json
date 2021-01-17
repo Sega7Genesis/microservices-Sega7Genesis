@@ -1,0 +1,10 @@
+[
+  {
+    "model": "store.user",
+    "pk": 1,
+    "fields": {
+      "name": "Test",
+      "user_uuid": "beabb854-52da-46ab-8bed-eef5f96d7da9"
+    }
+  }
+]

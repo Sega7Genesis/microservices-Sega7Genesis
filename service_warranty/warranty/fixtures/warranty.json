@@ -1,0 +1,22 @@
+[
+  {
+    "model": "warranty.warranty",
+    "pk": 1,
+    "fields": {
+      "comment": "",
+      "item_uid" : "a391de30-ee10-4ebf-8fdb-966dfa44da1c",
+      "status": "ON_WARRANTY",
+      "warranty_date": "2022-10-19T12:00:39.174Z"
+    }
+  },
+  {
+    "model": "warranty.warranty",
+    "pk": 2,
+    "fields": {
+      "comment": "",
+      "item_uid" : "752d8aa1-1b1f-4c3c-8a05-ff02e08de399",
+      "status": "ON_WARRANTY",
+      "warranty_date": "2022-10-19T12:00:39.174Z"
+    }
+  }
+]

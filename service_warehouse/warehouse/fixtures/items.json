@@ -1,0 +1,49 @@
+[
+  {
+    "model": "warehouse.items",
+    "pk": 1,
+    "fields": {
+      "model": "Lego 8070",
+      "size": "M",
+      "available_count": 10000
+    }
+  },
+  {
+    "model": "warehouse.items",
+    "pk": 3,
+    "fields": {
+      "model": "Lego 42070",
+      "size": "L",
+      "available_count": 10000
+    }
+  },
+  {
+    "model": "warehouse.items",
+    "pk": 2,
+    "fields": {
+      "model": "Lego 8880",
+      "size": "L",
+      "available_count": 10000
+    }
+  },
+  {
+    "model": "warehouse.orderItem",
+    "pk": 1,
+    "fields": {
+      "canceled": false,
+      "order_item_uid": "955f51fe-68d5-4895-b9ee-fc9ce16a31bf",
+      "order_uid": "7139cf57-3910-4d21-bf8a-7d0108e20d85",
+      "item_id": 2
+    }
+  },
+  {
+    "model": "warehouse.orderItem",
+    "pk": 2,
+    "fields": {
+      "canceled": false,
+      "order_item_uid": "3fdfe916-fc69-49df-a1d0-9762925bc2cf",
+      "order_uid": "0307da11-7367-4d0c-aa69-5246ea8013bd",
+      "item_id": 2
+    }
+  }
+]
