@@ -14,5 +14,53 @@ services:
     ports:
       - 5432:5432
 
+  warranty:
+    image: warranty:latest
+    container_name: warranty
+    command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/warranty/entrypoint.sh"]
+    build:
+      context: service_warranty
+    environment:
+      SERVICE_PORT: 8180
+    ports:
+      - 8180:8180
+
+  warehouse:
+    image: warehouse:latest
+    container_name: warehouse
+    command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/warehouse/entrypoint.sh"]
+    build:
+      context: service_warehouse
+    environment:
+      WARRANTY_URL: warranty:8180
+      SERVICE_PORT: 8280
+    ports:
+      - 8280:8280
+
+  order:
+    image: order:latest
+    container_name: order
+    command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/order/entrypoint.sh"]
+    build:
+      context: service_order
+    environment:
+      WAREHOUSE_URL: warehouse:8280
+      WARRANTY_URL: warranty:8180
+      SERVICE_PORT: 8380
+    ports:
+      - 8380:8380
+
+  store:
+    image: store:latest
+    container_name: store
+    command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/store/entrypoint.sh"]
+    build:
+      context: service_store
+    environment:
+      ORDER_URL: order:8380
+      SERVICE_PORT: 8480
+    ports:
+      - 8480:8480
+
 volumes:
   db-data:

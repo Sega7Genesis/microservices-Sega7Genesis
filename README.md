@@ -13,7 +13,7 @@ docker-compose up -d postgres
 * [local](postman/postman-local-environment.json);
 * [heroku](postman/postman-heroku-environment.json).
 
-Для автоматизированной проверки используется [GitHub Actions](.github/workflows/main.yml), CI/CD содержит шаги:
+Для автоматизированной проверки используется [GitHub Actions](../../Desktop/файлы/.github/workflows/main.yml), CI/CD содержит шаги:
 * сборка;
 * деплой _каждого_ приложения на Heroku;
 * прогон скриптов postman через newman для enviroment'а herkou.

@@ -1,5 +1,7 @@
 -- file: 10-create-user-and-db.sql
-CREATE DATABASE services;
 CREATE ROLE program WITH PASSWORD 'test';
-GRANT ALL PRIVILEGES ON DATABASE services TO program;
+CREATE DATABASE orders OWNER program;
+CREATE DATABASE store OWNER program;
+CREATE DATABASE warehouse OWNER program;
+CREATE DATABASE warranty OWNER program;
 ALTER ROLE program WITH LOGIN;

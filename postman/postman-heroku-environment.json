@@ -4,22 +4,22 @@
 	"values": [
 		{
 			"key": "storeUrl",
-			"value": "https://store-service-app.herokuapp.com",
+			"value": "https://enine-store.herokuapp.com",
 			"enabled": true
 		},
 		{
 			"key": "warrantyUrl",
-			"value": "https://warranty-service-app.herokuapp.com",
+			"value": "https://enine-warranty.herokuapp.com",
 			"enabled": true
 		},
 		{
 			"key": "orderUrl",
-			"value": "https://order-service-app.herokuapp.com",
+			"value": "https://enine-order.herokuapp.com",
 			"enabled": true
 		},
 		{
 			"key": "warehouseUrl",
-			"value": "https://warehouse-service-app.herokuapp.com",
+			"value": "https://enine-warehouse.herokuapp.com",
 			"enabled": true
 		},
 		{
@@ -29,7 +29,7 @@
 		},
 		{
 			"key": "mainUserUid",
-			"value": "6D2CB5A0-943C-4B96-9AA6-89EAC7BDFD2B",
+			"value": "beabb854-52da-46ab-8bed-eef5f96d7da9",
 			"enabled": true
 		},
 		{
@@ -49,7 +49,7 @@
 		},
 		{
 			"key": "userUid",
-			"value": "beabb854-52da-46ab-8bed-eef5f96d7da9",
+			"value": "b39c3fbb-0f0a-4635-8957-86646721cb7b",
 			"enabled": true
 		}
 	],

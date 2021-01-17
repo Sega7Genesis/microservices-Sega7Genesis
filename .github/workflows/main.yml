@@ -1,4 +1,4 @@
-name: Build project
+ame: Build project
 on: [ push ]
 jobs:
   build:
@@ -8,6 +8,17 @@ jobs:
       - uses: actions/checkout@v2
       # TODO Build projects
       # TODO deploy to Heroku
+      - name: Build and deploy
+        id: heroku
+        uses: snithyanantham/docker-compose-multiple-apps-heroku-deploy@v1.0
+        with:
+          email: nekvolosatov@yandex.ru
+          api_key: 9cca75bf-6542-4653-9f5b-5fad1e1b9565
+          docker_compose_file: './docker-compose.heroku.yml'
+          heroku_apps: '[{"imagename":"store","appname":"volosatov-store","apptype":"web"},
+          {"imagename":"order","appname":"volosatov-order","apptype":"web"},
+          {"imagename":"warehouse","appname":"volosatov-warehouse","apptype":"web"},
+          {"imagename":"warranty","appname":"volosatov-warranty","apptype":"web"}]'
       - name: Run API Tests
         id: run-newman
         uses: anthonyvscode/newman-action@v1
