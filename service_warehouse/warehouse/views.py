@@ -10,7 +10,7 @@ from .models import Items, OrderItem
 from .serializers import ItemsSerializer, OrderItemSerializer
 
 
-warranty_url = os.environ.get("WARRANTY_URL", "enine-warranty.herokuapp.com")
+warranty_url = os.environ.get("WARRANTY_URL", "volosatov-warranty.herokuapp.com")
 
 
 class ItemsView(APIView):

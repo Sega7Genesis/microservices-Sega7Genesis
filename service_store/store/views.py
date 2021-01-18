@@ -8,7 +8,7 @@ from .models import User
 from .serializers import UserSerializer
 
 
-order_url = os.environ.get("ORDER_URL", "enine-order.herokuapp.com")
+order_url = os.environ.get("ORDER_URL", "volosatov-order.herokuapp.com")
 
 
 class UserView(APIView):

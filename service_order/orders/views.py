@@ -11,8 +11,8 @@ from .models import Order
 from .serializers import OrderSerializer
 
 
-warehouse_url = os.environ.get("WAREHOUSE_URL", "enine-warehouse.herokuapp.com")
-warranty_url = os.environ.get("WARRANTY_URL", "enine-warranty.herokuapp.com")
+warehouse_url = os.environ.get("WAREHOUSE_URL", "volosatov-warehouse.herokuapp.com")
+warranty_url = os.environ.get("WARRANTY_URL", "volosatov-warranty.herokuapp.com")
 
 
 class OrdersView(APIView):

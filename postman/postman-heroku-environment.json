@@ -4,22 +4,22 @@
 	"values": [
 		{
 			"key": "storeUrl",
-			"value": "https://enine-store.herokuapp.com",
+			"value": "https://volosatov-store.herokuapp.com",
 			"enabled": true
 		},
 		{
 			"key": "warrantyUrl",
-			"value": "https://enine-warranty.herokuapp.com",
+			"value": "https://volosatov-warranty.herokuapp.com",
 			"enabled": true
 		},
 		{
 			"key": "orderUrl",
-			"value": "https://enine-order.herokuapp.com",
+			"value": "https://volosatov-order.herokuapp.com",
 			"enabled": true
 		},
 		{
 			"key": "warehouseUrl",
-			"value": "https://enine-warehouse.herokuapp.com",
+			"value": "https://volosatov-warehouse.herokuapp.com",
 			"enabled": true
 		},
 		{
