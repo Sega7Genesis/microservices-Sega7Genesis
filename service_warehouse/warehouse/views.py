@@ -56,9 +56,9 @@ class OrderItemView(APIView):
             #item.save()
             #ORDER
             warranty = warranty_cb.do_request(f"http://{warranty_url}/api/v1/warranty/{orderItemUid}", http_method='delete')
-            if warranty.status_code == 404:
-                return Response({'message': f'cant delete warranty with orderItemUid {orderItemUid}'}, status=404,
-                                content_type='application/json')
+            #if warranty.status_code == 404:
+            #    return Response({'message': f'cant delete warranty with orderItemUid {orderItemUid}'}, status=404,
+            #                    content_type='application/json')
             if warranty.status_code == 503:
                 return warranty
             #url = f"http://{warranty_url}/api/v1/warranty/{orderItemUid}"
