@@ -80,7 +80,4 @@ class OrderItemWarrantyView(APIView):
         if response.status_code == 503:
             return response
         #response = requests.post(url, {'availableCount': item.available_count})
-        if response.status_code == 404:
-            return Response({"message": f"Warranty not found for itemUid \'{orderItemUid}\'"},
-                            status=404, content_type="application/json")
         return Response(response.data, content_type='application/json')

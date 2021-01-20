@@ -6,17 +6,17 @@ Q_URL = os.environ.get('Q_URL', 'amqps://piwixsja:M3Q0QoqxaMneNRXtCtijp7JqI14yZC
 Q_NAME = 'rabbit'
 
 class Uses_Q:
-    def connect(self):
+    def __enter__(self):
         self.connection = pika.BlockingConnection(pika.URLParameters(Q_URL))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=Q_NAME)
         return self
 
-    def disconnect(self):
+    def __exit__(self, *args):
         self.connection.close()
 
     def send(self, req):
-        self.channel.basic_publish(routing_key='Q_NAME', body=json.dump(req))
+        self.channel.basic_publish(exchange='', routing_key='Q_NAME', body=json.dumps(req))
 
     def take(self):
         for method_frame, properties, body in self.channel.consume(Q_NAME, inactivity_timeout=0):

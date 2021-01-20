@@ -90,15 +90,15 @@ class StoreWarranty(APIView):
             return Response({'message': f'cant find warranty on order with order_id {order_id} '}, status=404, content_type='application/json')
         if warranty.status_code == 503:
             #TODO add request to queue order_id user_id datetime.now
-            with Uses_Q as mq:
-                mq.send({'time': datetime.now, 'user_id': user_id, 'order_id': order_id})
-            return Response({'message': f'warranty is unavailable< but your request is on queue'})
+            with Uses_Q() as mq:
+                mq.send({'time': str(datetime.now()), 'user_id': str(user_id), 'order_id': str(order_id)})
+            return Response({'message': f'warranty is unavailable, but your request is on queue'})
         #warranty = requests.post(f"http://{order_url}/api/v1/orders/{order_id}/warranty").json()
 
         warranty = warranty.data
         #TODO for req in
         old_results = []
-        with Uses_Q as mq:
+        with Uses_Q() as mq:
             for req in mq.take():
                 result = warranty_cb.do_request(f"http://{order_url}/api/v1/orders/{req.get('order_id')}/warranty",
                                                 http_method='post')
