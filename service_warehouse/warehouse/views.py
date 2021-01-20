@@ -5,13 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.http import QueryDict
-
+from .my_cb import my_circle_breaker
 from .models import Items, OrderItem
 from .serializers import ItemsSerializer, OrderItemSerializer
 
-
 warranty_url = os.environ.get("WARRANTY_URL", "volosatov-warranty.herokuapp.com")
-
+warranty_cb = my_circle_breaker(3, 60)
 
 class ItemsView(APIView):
     def get(self, request):
@@ -55,9 +54,15 @@ class OrderItemView(APIView):
             item = get_object_or_404(Items, id=order_item.item_id)
             item.available_count += 1
             item.save()
-
-            url = f"http://{warranty_url}/api/v1/warranty/{orderItemUid}"
-            requests.delete(url)
+            #ORDER
+            warranty = warranty_cb.do_request(f"http://{warranty_url}/api/v1/warranty/{orderItemUid}", http_method='delete')
+            if warranty.status_code == 404:
+                return Response({'message': f'cant delete warranty with orderItemUid {orderItemUid}'}, status=404,
+                                content_type='application/json')
+            if warranty.status_code == 503:
+                return warranty
+            #url = f"http://{warranty_url}/api/v1/warranty/{orderItemUid}"
+            #requests.delete(url)
         return Response(status=204)
 
 
@@ -66,7 +71,13 @@ class OrderItemWarrantyView(APIView):
         url = f"http://{warranty_url}/api/v1/warranty/{orderItemUid}/warranty"
         order_item = get_object_or_404(OrderItem, order_item_uid=orderItemUid)
         item = get_object_or_404(Items, id=order_item.item_id)
-        response = requests.post(url, {'availableCount': item.available_count})
+        response = warranty_cb.do_request(url, http_method='post', context={'availableCount': item.available_count})
+        if response.status_code == 404:
+            return Response({'message': f"Warranty not found for itemUid \'{orderItemUid}\'"}, status=404,
+                            content_type='application/json')
+        if response.status_code == 503:
+            return response
+        #response = requests.post(url, {'availableCount': item.available_count})
         if response.status_code == 404:
             return Response({"message": f"Warranty not found for itemUid \'{orderItemUid}\'"},
                             status=404, content_type="application/json")

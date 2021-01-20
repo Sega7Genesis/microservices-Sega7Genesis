@@ -21,7 +21,7 @@ services:
     build:
       context: service_warranty
     environment:
-      SERVICE_PORT: 8180
+      PORT: 8180
     ports:
       - 8180:8180
 
@@ -33,7 +33,7 @@ services:
       context: service_warehouse
     environment:
       WARRANTY_URL: warranty:8180
-      SERVICE_PORT: 8280
+      PORT: 8280
     ports:
       - 8280:8280
 
@@ -46,7 +46,7 @@ services:
     environment:
       WAREHOUSE_URL: warehouse:8280
       WARRANTY_URL: warranty:8180
-      SERVICE_PORT: 8380
+      PORT: 8380
     ports:
       - 8380:8380
 
@@ -58,7 +58,7 @@ services:
       context: service_store
     environment:
       ORDER_URL: order:8380
-      SERVICE_PORT: 8480
+      PORT: 8480
     ports:
       - 8480:8480
 

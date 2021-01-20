@@ -3,13 +3,14 @@ import os
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-
+from .my_cb import my_circle_breaker
 from .models import User
 from .serializers import UserSerializer
 
 
 order_url = os.environ.get("ORDER_URL", "volosatov-order.herokuapp.com")
-
+order_cb = my_circle_breaker(3, 60)
+warranty_cb = my_circle_breaker(3, 60)
 
 class UserView(APIView):
     def get(self, request):
@@ -29,7 +30,12 @@ class UserView(APIView):
 class StoreOrders(APIView):
     def get(self, request, user_id):
         user = get_object_or_404(User, user_uuid=user_id)
-        orders = requests.get(f"http://{order_url}/api/v1/orders/{user.user_uuid}")
+        orders = order_cb.do_request(f"http://{order_url}/api/v1/orders/{user.user_uuid}", http_method='get')
+        #orders = requests.get(f"http://{order_url}/api/v1/orders/{user.user_uuid}")
+        if orders.status_code == 404:
+            return Response({'message': f'user with user_uuid {user_id} not found in orders'}, status=404, content_type='application/json')
+        if orders.status_code == 503:
+            return orders
         return Response(orders.json(), content_type="application/json")
 
 
@@ -39,28 +45,49 @@ class StorePurchase(APIView):
         json_data = request.data
         model = json_data.get('model')
         size = json_data.get('size')
-        new_order = requests.post(f"http://{order_url}/api/v1/orders/{user.user_uuid}",
-                                  {"model": model, "size": size}).json()
+        #TODO new_order as orders
+        new_order = order_cb.do_request(f"http://{order_url}/api/v1/orders/{user.user_uuid}", http_method='post', context={"model": model, "size": size})
+        #new_order = requests.post(f"http://{order_url}/api/v1/orders/{user.user_uuid}",
+        #                          {"model": model, "size": size}).json()
         headers = {"Location": f"/{new_order.get('orderUid')}"}
+        if new_order.status_code == 404:
+            return Response({'message': 'cant create new order'}, status=404, content_type='application/json')
+        if new_order.status_code == 503:
+            return new_order
         return Response(status=201, headers=headers)
 
 
 class StoreOrderDetail(APIView):
     def get(self, request, user_id, order_id):
         user = get_object_or_404(User, user_uuid=user_id)
-        order_detail = requests.get(f"http://{order_url}/api/v1/orders/{user_id}/{order_id}")
+        order_detail = order_cb.do_request(f"http://{order_url}/api/v1/orders/{user_id}/{order_id}", hhtp_method='get')
+        #order_detail = requests.get(f"http://{order_url}/api/v1/orders/{user_id}/{order_id}")
+        if order_detail.status_code == 404:
+            return Response({'message': f'cant find order with order_id {order_id} '}, status=404, content_type='application/json')
+        if order_detail.status_code == 503:
+            return order_detail
         return Response(order_detail.json(), content_type="application/json")
 
 
 class StoreRefund(APIView):
     def delete(self, request, user_id, order_id):
-        order = requests.delete(f"http://{order_url}/api/v1/orders/{order_id}")
+        order = order_cb.do_request(f"http://{order_url}/api/v1/orders/{order_id}", http_method='delete')
+        #order = requests.delete(f"http://{order_url}/api/v1/orders/{order_id}")
+        if order.status_code == 404:
+            return Response({'message': f'cant delete order with order_id {order_id}'}, status=404, content_type='application/json')
+        if order.status_code == 503:
+            return order
         return Response(status=order.status_code)
 
 
 class StoreWarranty(APIView):
     def post(self, request, user_id, order_id):
         user = get_object_or_404(User, user_uuid=user_id)
-        warranty = requests.post(f"http://{order_url}/api/v1/orders/{order_id}/warranty").json()
+        warranty = warranty_cb.do_request(f"http://{order_url}/api/v1/orders/{order_id}/warranty", http_method='post')
+        if warranty.status_code == 404:
+            return Response({'message': f'cant find warranty on order with order_id {order_id} '}, status=404, content_type='application/json')
+        if warranty.status_code == 503:
+            return warranty
+        #warranty = requests.post(f"http://{order_url}/api/v1/orders/{order_id}/warranty").json()
         warranty.update({"orderUid": order_id})
         return Response(warranty, content_type="application/json")
