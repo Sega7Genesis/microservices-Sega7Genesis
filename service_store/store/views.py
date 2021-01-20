@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from .my_cb import my_circle_breaker
 from .models import User
 from .serializers import UserSerializer
+from .rabbit import Uses_Q
+from datetime import datetime
 
 
 order_url = os.environ.get("ORDER_URL", "volosatov-order.herokuapp.com")
@@ -87,8 +89,21 @@ class StoreWarranty(APIView):
         if warranty.status_code == 404:
             return Response({'message': f'cant find warranty on order with order_id {order_id} '}, status=404, content_type='application/json')
         if warranty.status_code == 503:
-            return warranty
+            #TODO add request to queue order_id user_id datetime.now
+            with Uses_Q as mq:
+                mq.send({'time': datetime.now, 'user_id': user_id, 'order_id': order_id})
+            return Response({'message': f'warranty is unavailable< but your request is on queue'})
         #warranty = requests.post(f"http://{order_url}/api/v1/orders/{order_id}/warranty").json()
+
         warranty = warranty.data
-        warranty.update({"orderUid": order_id})
+        #TODO for req in
+        old_results = []
+        with Uses_Q as mq:
+            for req in mq.take():
+                result = warranty_cb.do_request(f"http://{order_url}/api/v1/orders/{req.get('order_id')}/warranty",
+                                                http_method='post')
+                req.update(result.data)
+                old_results.append(req)
+        #добавил старые результаты для видимости
+        warranty.update({"orderUid": order_id, 'old_results': old_results})
         return Response(warranty, content_type="application/json")

@@ -2,7 +2,7 @@ import os
 import pika
 import json
 
-Q_URL = os.environ.get('Q_URL', 'amqp://localhost')
+Q_URL = os.environ.get('Q_URL', 'amqps://piwixsja:M3Q0QoqxaMneNRXtCtijp7JqI14yZCZU@owl.rmq.cloudamqp.com/piwixsja')
 Q_NAME = 'rabbit'
 
 class Uses_Q:
