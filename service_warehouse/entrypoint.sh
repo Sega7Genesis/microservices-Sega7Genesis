@@ -8,10 +8,10 @@ python manage.py migrate warehouse --no-input
 echo "Collect static files"
 python manage.py collectstatic --no-input
 
-if [ "$(python manage.py count_items)" -eq 0 ]; then
-  echo "Loading items"
-  python manage.py loaddata items.json --ignorenonexistent
-fi
+
+echo "Loading items"
+python manage.py loaddata items.json --ignorenonexistent
+
 
 # Start server
 echo "Starting server"

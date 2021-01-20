@@ -36,7 +36,7 @@ class StoreOrders(APIView):
             return Response({'message': f'user with user_uuid {user_id} not found in orders'}, status=404, content_type='application/json')
         if orders.status_code == 503:
             return orders
-        return Response(orders.json(), content_type="application/json")
+        return Response(orders.data, content_type="application/json")
 
 
 class StorePurchase(APIView):
@@ -49,7 +49,7 @@ class StorePurchase(APIView):
         new_order = order_cb.do_request(f"http://{order_url}/api/v1/orders/{user.user_uuid}", http_method='post', context={"model": model, "size": size})
         #new_order = requests.post(f"http://{order_url}/api/v1/orders/{user.user_uuid}",
         #                          {"model": model, "size": size}).json()
-        headers = {"Location": f"/{new_order.get('orderUid')}"}
+        headers = {"Location": f"/{new_order.data.get('orderUid')}"}
         if new_order.status_code == 404:
             return Response({'message': 'cant create new order'}, status=404, content_type='application/json')
         if new_order.status_code == 503:
@@ -60,13 +60,13 @@ class StorePurchase(APIView):
 class StoreOrderDetail(APIView):
     def get(self, request, user_id, order_id):
         user = get_object_or_404(User, user_uuid=user_id)
-        order_detail = order_cb.do_request(f"http://{order_url}/api/v1/orders/{user_id}/{order_id}", hhtp_method='get')
+        order_detail = order_cb.do_request(f"http://{order_url}/api/v1/orders/{user_id}/{order_id}", http_method='get')
         #order_detail = requests.get(f"http://{order_url}/api/v1/orders/{user_id}/{order_id}")
         if order_detail.status_code == 404:
             return Response({'message': f'cant find order with order_id {order_id} '}, status=404, content_type='application/json')
         if order_detail.status_code == 503:
             return order_detail
-        return Response(order_detail.json(), content_type="application/json")
+        return Response(order_detail.data, content_type="application/json")
 
 
 class StoreRefund(APIView):
@@ -89,5 +89,6 @@ class StoreWarranty(APIView):
         if warranty.status_code == 503:
             return warranty
         #warranty = requests.post(f"http://{order_url}/api/v1/orders/{order_id}/warranty").json()
+        warranty = warranty.data
         warranty.update({"orderUid": order_id})
         return Response(warranty, content_type="application/json")

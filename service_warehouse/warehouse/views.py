@@ -49,11 +49,11 @@ class OrderItemView(APIView):
         order_item = get_object_or_404(OrderItem, order_item_uid=orderItemUid)
         if not order_item.canceled:
             order_item.canceled = True
-            order_item.save()
+            #order_item.save()
             # increase items count in warranty
             item = get_object_or_404(Items, id=order_item.item_id)
             item.available_count += 1
-            item.save()
+            #item.save()
             #ORDER
             warranty = warranty_cb.do_request(f"http://{warranty_url}/api/v1/warranty/{orderItemUid}", http_method='delete')
             if warranty.status_code == 404:
@@ -63,6 +63,8 @@ class OrderItemView(APIView):
                 return warranty
             #url = f"http://{warranty_url}/api/v1/warranty/{orderItemUid}"
             #requests.delete(url)
+            order_item.save()
+            item.save()
         return Response(status=204)
 
 
@@ -81,4 +83,4 @@ class OrderItemWarrantyView(APIView):
         if response.status_code == 404:
             return Response({"message": f"Warranty not found for itemUid \'{orderItemUid}\'"},
                             status=404, content_type="application/json")
-        return Response(response.json(), content_type='application/json')
+        return Response(response.data, content_type='application/json')

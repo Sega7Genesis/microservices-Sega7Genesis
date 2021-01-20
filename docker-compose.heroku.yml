@@ -1,18 +1,5 @@
 version: "3"
 services:
-  postgres:
-    image: library/postgres:13
-    container_name: postgres
-    restart: on-failure
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "postgres"
-      POSTGRES_DB: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data
-      - ./postgres/:/docker-entrypoint-initdb.d/
-    ports:
-      - 5432:5432
 
   warranty:
     image: warranty:latest
@@ -20,8 +7,6 @@ services:
     command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/warranty/entrypoint.sh"]
     build:
       context: service_warranty
-    environment:
-      SERVICE_PORT: 8000
 
 
   warehouse:
@@ -30,10 +15,6 @@ services:
     command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/warehouse/entrypoint.sh"]
     build:
       context: service_warehouse
-    environment:
-      WARRANTY_URL: volosatov-warranty.herokuapp.com
-      SERVICE_PORT: 8000
-
 
   order:
     image: order:latest
@@ -41,10 +22,6 @@ services:
     command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/order/entrypoint.sh"]
     build:
       context: service_order
-    environment:
-      WAREHOUSE_URL: volosatov-warehouse.herokuapp.com
-      WARRANTY_URL: volosatov-warranty.herokuapp.com
-      SERVICE_PORT: 8000
 
 
   store:
@@ -53,9 +30,6 @@ services:
     command: ["wait-for-it", "postgres:5432", "-s", "-t", "0", "--", "/opt/store/entrypoint.sh"]
     build:
       context: service_store
-    environment:
-      ORDER_URL: volosatov-order.herokuapp.com
-      SERVICE_PORT: 8000
 
 volumes:
   db-data:

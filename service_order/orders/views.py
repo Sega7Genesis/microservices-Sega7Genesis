@@ -32,10 +32,16 @@ class OrdersView(APIView):
         json_data.update({"user_uid": userUid})
         json_data.update({'order_date': datetime.datetime.now(), 'status': 'PAID', 'order_uid': uuid.uuid1()})
 
-        response = requests.get(f'http://{warehouse_url}/api/v1/warehouse', json_data).json()
+        #response = requests.get(f'http://{warehouse_url}/api/v1/warehouse', json_data).json()
+        response = warehouse_cb.do_request(f'http://{warehouse_url}/api/v1/warehouse', http_method='get', context=json_data)
+        if response.status_code == 404:
+            return Response({'message': f' cant get request from warehouse'}, status=404,
+                            content_type='application/json')
+        if response.status_code == 503:
+            return response
         model = json_data.get('model')
         size = json_data.get('size')
-        needed_item = [x for x in response if x.get('model') == model and
+        needed_item = [x for x in response.data if x.get('model') == model and
                        x.get('size') == size and x.get('available_count') > 0]
 
         if needed_item:
@@ -47,17 +53,17 @@ class OrdersView(APIView):
                                 content_type='application/json')
             if warehouse_response.status_code == 503:
                 return warehouse_response
-            json_data.update({"item_uid": response.get('orderItemUid')})
+            json_data.update({"item_uid": warehouse_response.data.get('orderItemUid')})
 
             # MOVED FROM WAREHOUSE STR 34
 
             url = f"http://{warranty_url}/api/v1/warranty/{json_data.get('item_uid')}"
             warranty_response = warranty_cb.do_request(url, http_method='post')
-            if warranty_response.status_code == 404:
-                return Response({'message': f' cant find warranty on item'}, status=404,
+            if warranty_response.status_code != 204:
+                warehouse_cb.do_request(f"http://{warehouse_url}/api/v1/warehouse/{json_data.get('item_uid')}", http_method='delete')
+                return Response({'message': f' cant create warranty on item, rolling back'}, status=502,
                                 content_type='application/json')
-            if warranty_response.status_code == 503:
-                return warranty_response
+
             #requests.post(url)
 
             serializer = OrderSerializer(data=json_data)
@@ -97,23 +103,18 @@ class OrderIdView(APIView):
             if items.status_code == 503:
                 result.update({"model": None, "size": None})
             else:
-                needed_item = [x for x in items if x.get('id') == order_item.get("item_id")][0]
+                needed_item = [x for x in items.data if x.get('id') == order_item.data.get("item_id")][0]
                 result.update({"model": needed_item.get("model"), "size": needed_item.get("size")})
         #items = requests.get(f'http://{warehouse_url}/api/v1/warehouse').json()
 
         #needed_item = [x for x in items if x.get('id') == order_item.get("item_id")][0]
         #warranty = requests.get(f'http://{warranty_url}/api/v1/warranty/{order.item_uid}').json()
         warranty = warranty_cb.do_request(f'http://{warranty_url}/api/v1/warranty/{order.item_uid}', http_method='get')
-        if warranty.status_code == 404:
-            return Response({'message': f' cant find warranty on item with order item uid {order.item_uid}'}, status=404,
-                            content_type='application/json')
-        if warranty.status_code == 503:
-            result.update({"warrantyDate": warranty.get("warrantyDate"), "warrantyStatus": warranty.get("warrantyStatus")},
-                        content_type="application/json")
-        return Response({"orderUid": order.order_uid, "itemUid": order.item_uid, "status": order.status,
-                         "date": order.order_date, "model": needed_item.get("model"), "size": needed_item.get("size"),
-                        "warrantyDate": warranty.get("warrantyDate"), "warrantyStatus": warranty.get("warrantyStatus")},
-                        content_type="application/json")
+        if warranty.status_code == 200:
+            result.update({"warrantyDate": warranty.data.get("warrantyDate"), "warrantyStatus": warranty.data.get("warrantyStatus")})
+        else:
+            result.update({"warrantyDate": None, "warrantyStatus": None})
+        return Response(result, content_type="application/json")
         #
         #if t
 
@@ -130,5 +131,5 @@ class OrderWarranty(APIView):
             if response.status_code == 503:
                 return response
             #response = requests.post(url).json()
-            return Response(response, content_type="application/json")
+            return Response(response.data, content_type="application/json")
         return Response(status=404, content_type="application/json")

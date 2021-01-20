@@ -8,10 +8,9 @@ python manage.py migrate orders --no-input
 echo "Collect static files"
 python manage.py collectstatic --no-input
 
-if [ "$(python manage.py count_orders)" -eq 0 ]; then
-  echo "Loading items"
-  python manage.py loaddata orders.json --ignorenonexistent
-fi
+
+echo "Loading items"
+python manage.py loaddata orders.json --ignorenonexistent
 
 
 # Start server

@@ -8,10 +8,10 @@ python manage.py migrate warranty --no-input
 echo "Collect static files"
 python manage.py collectstatic --no-input
 
-if [ "$(python manage.py count_warranty)" -eq 0 ]; then
-  echo "Loading items"
-  python manage.py loaddata warranty.json --ignorenonexistent
-fi
+
+echo "Loading items"
+python manage.py loaddata warranty.json --ignorenonexistent
+
 
 
 # Start server

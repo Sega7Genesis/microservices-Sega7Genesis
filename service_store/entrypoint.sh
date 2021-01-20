@@ -8,10 +8,10 @@ python manage.py migrate store --no-input
 echo "Collect static files"
 python manage.py collectstatic --no-input
 
-if [ "$(python manage.py count_users)" -eq 0 ]; then
-  echo "Loading items"
-  python manage.py loaddata users.json --ignorenonexistent
-fi
+
+echo "Loading items"
+python manage.py loaddata users.json --ignorenonexistent
+
 
 
 # Start server
